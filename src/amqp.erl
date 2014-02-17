@@ -23,7 +23,7 @@ basic_handle(Channel, Message, State, HandleFunc) ->
 		#'basic.consume_ok'{} ->
 			ok;
         {#'basic.deliver'{delivery_tag = Tag}, #amqp_msg{payload = Body}} ->
-            case HandleFunc(Body, State) of
+            case HandleFunc(erlang:binary_to_term(Body), State) of
             	ok -> amqp_channel:cast(Channel, #'basic.ack'{delivery_tag = Tag});
             	_ -> noproc
             end,
