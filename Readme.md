@@ -1,0 +1,2 @@
+Compile:
+	./rebar compile -DALONE

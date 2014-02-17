@@ -1,0 +1,12 @@
+{application, lib_members,
+ [
+  {description, ""},
+  {vsn, "1"},
+  {registered, []},
+  {applications, [
+                  kernel,
+                  stdlib
+                 ]},
+  {mod, { lib_members_app, []}},
+  {env, []}
+ ]}.
