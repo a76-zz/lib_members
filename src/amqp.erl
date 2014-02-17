@@ -8,14 +8,11 @@
 -include_lib("deps/amqp_client/include/amqp_client.hrl").
 -endif.
 
-connect(Host) ->
+connect(Host, Queue) ->
 	{ok, Connection} = amqp_connection:start(#amqp_params_network{host = Host}),
     {ok, Channel} = amqp_connection:open_channel(Connection),
-    {ok, Connection, Channel}.
-
-declare_queue(Channel, Queue) ->
     amqp_channel:call(Channel, #'queue.declare'{queue = Queue}),
-    ok.
+    {ok, Connection, Channel}.
 
 basic_subscribe(Channel, Queue, HandlePid) ->
 	amqp_channel:subscribe(Channel, #'basic.consume'{queue = Queue}, HandlePid),
