@@ -30,7 +30,7 @@ basic_handle(Channel, Message, State, HandleFunc) ->
             ok
     end.
 
-basic_send(Channel, Message, RoutingKey) ->
+basic_send(Channel, RoutingKey, Message) ->
     amqp_channel:cast(Channel,
                       #'basic.publish'{
                       exchange = <<"">>,
