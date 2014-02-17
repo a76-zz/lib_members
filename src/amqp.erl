@@ -13,13 +13,16 @@ connect(Host) ->
     {ok, Channel} = amqp_connection:open_channel(Connection),
     {ok, Connection, Channel}.
 
+declare_queue(Channel, Queue) ->
+    amqp_channel:call(Channel, #'queue.declare'{queue = Queue}),
+    ok.
+
 basic_subscribe(Channel, Queue, HandlePid) ->
-	amqp_channel:call(Channel, #'queue.declare'{queue = Queue}),
 	amqp_channel:subscribe(Channel, #'basic.consume'{queue = Queue}, HandlePid),
 	ok.
 
-basic_handle(Channel, Info, State, HandleFunc) ->
-	case Info of
+basic_handle(Channel, Message, State, HandleFunc) ->
+	case Message of
 		#'basic.consume_ok'{} ->
 			ok;
         {#'basic.deliver'{delivery_tag = Tag}, #amqp_msg{payload = Body}} ->
@@ -29,6 +32,14 @@ basic_handle(Channel, Info, State, HandleFunc) ->
             end,
             ok
     end.
+
+basic_send(Channel, Message, RoutingKey) ->
+    amqp_channel:cast(Channel,
+                      #'basic.publish'{
+                      exchange = <<"">>,
+                      routing_key = RoutingKey},
+                      #amqp_msg{payload = erlang:term_to_binary(Message)}),
+    ok.
 
 disconnect(Connection, Channel) ->
 	ok = amqp_channel:close(Channel),
